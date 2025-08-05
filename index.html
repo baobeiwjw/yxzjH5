@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>王者荣耀 - 游戏下载</title>
+	<style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+      }
+
+      .container {
+          text-align: center;
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 20px;
+          padding: 40px 30px;
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+          max-width: 400px;
+          width: 100%;
+      }
+
+      .logo {
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(45deg, #ff6b6b, #feca57);
+          border-radius: 20px;
+          margin: 0 auto 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+          color: white;
+          font-weight: bold;
+      }
+
+      .title {
+          color: #333;
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 10px;
+      }
+
+      .subtitle {
+          color: #666;
+          font-size: 14px;
+          margin-bottom: 30px;
+      }
+
+      .download-btn {
+          background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+          color: white;
+          border: none;
+          padding: 15px 40px;
+          font-size: 18px;
+          font-weight: bold;
+          border-radius: 50px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+          width: 100%;
+          max-width: 280px;
+      }
+
+      .download-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+      }
+
+      .download-btn:active {
+          transform: translateY(0);
+      }
+
+      .system-info {
+          margin-top: 20px;
+          font-size: 12px;
+          color: #999;
+      }
+
+      @media (max-width: 480px) {
+          .container {
+              padding: 30px 20px;
+          }
+
+          .title {
+              font-size: 20px;
+          }
+
+          .download-btn {
+              font-size: 16px;
+              padding: 12px 30px;
+          }
+      }
+	</style>
+</head>
+<body>
+<div class="container">
+	<div class="logo">王者</div>
+	<h1 class="title">王者荣耀</h1>
+	<p class="subtitle">5v5英雄公平对战手游</p>
+
+	<button class="download-btn" onclick="downloadGame()">
+		进入 王者荣耀
+	</button>
+
+	<div class="system-info" id="systemInfo">
+		正在检测您的设备...
+	</div>
+</div>
+
+<script>
+	// 检测用户设备类型
+	function detectDevice() {
+		const userAgent = navigator.userAgent.toLowerCase();
+		const systemInfo = document.getElementById('systemInfo');
+
+		if (/iphone|ipad|ipod/.test(userAgent)) {
+			systemInfo.textContent = '检测到 iOS 设备';
+			return 'ios';
+		} else if (/android/.test(userAgent)) {
+			// 检测是否为鸿蒙系统
+			if (/harmonyos|hongmeng/.test(userAgent)) {
+				systemInfo.textContent = '检测到 鸿蒙系统';
+				return 'harmonyos';
+			}
+			systemInfo.textContent = '检测到 Android 设备';
+			return 'android';
+		} else if (/windows/.test(userAgent)) {
+			systemInfo.textContent = '检测到 Windows 设备';
+			return 'windows';
+		} else {
+			systemInfo.textContent = '未知设备类型';
+			return 'unknown';
+		}
+	}
+
+	// 下载或启动游戏
+	function downloadGame() {
+		const deviceType = detectDevice();
+
+		// 定义各平台的下载链接和启动方案
+		const gameLinks = {
+			ios: {
+				// iOS App Store 链接
+				store: 'https://apps.apple.com/cn/app/王者荣耀/id989673964',
+				// iOS URL Scheme
+				scheme: 'com.tencent.smoba://'
+			},
+			android: {
+				// 应用宝下载链接
+				store: 'https://sj.qq.com/myapp/detail.htm?apkName=com.tencent.tmgp.sgame',
+				// Android Intent
+				scheme: 'intent://mobile#Intent;scheme=com.tencent.tmgp.sgame;package=com.tencent.tmgp.sgame;end'
+			},
+			harmonyos: {
+				// 华为应用市场
+				store: 'https://appgallery.huawei.com/app/C100066193',
+				// 鸿蒙应用启动
+				scheme: 'com.tencent.tmgp.sgame://'
+			}
+		};
+
+		const currentPlatform = gameLinks[deviceType];
+
+		if (!currentPlatform) {
+			alert('暂不支持当前设备，请前往官网下载');
+			window.open('https://pvp.qq.com/');
+			return;
+		}
+
+		// 尝试启动已安装的游戏
+		if (deviceType === 'ios') {
+			// iOS 使用 URL Scheme 启动
+			const iframe = document.createElement('iframe');
+			iframe.style.display = 'none';
+			iframe.src = currentPlatform.scheme;
+			document.body.appendChild(iframe);
+
+			// 如果无法启动（游戏未安装），跳转到App Store
+			setTimeout(() => {
+				document.body.removeChild(iframe);
+				window.location.href = currentPlatform.store;
+			}, 2000);
+
+		} else if (deviceType === 'android' || deviceType === 'harmonyos') {
+			// Android/鸿蒙 使用 Intent 启动
+			try {
+				window.location.href = currentPlatform.scheme;
+			} catch (e) {
+				// 如果启动失败，跳转到应用商店
+				window.location.href = currentPlatform.store;
+			}
+
+			// 备用方案：延迟跳转到应用商店
+			setTimeout(() => {
+				if (document.hidden === false) {
+					window.location.href = currentPlatform.store;
+				}
+			}, 3000);
+		}
+	}
+
+	// 页面加载时检测设备
+	window.onload = function() {
+		detectDevice();
+	};
+
+	// 处理页面可见性变化（用于判断是否成功启动游戏）
+	document.addEventListener('visibilitychange', function() {
+		if (document.hidden) {
+			// 页面被隐藏，可能是成功启动了游戏
+			console.log('可能已成功启动游戏');
+		}
+	});
+</script>
+</body>
+</html>
